@@ -1,0 +1,13 @@
+package pw.pdm.pdmserver;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class PdmServerApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(PdmServerApplication.class, args);
+    }
+
+}
