@@ -1,10 +1,10 @@
 ### Build
-
-1. Build the project with
+1. Put file "application.properties" in "src/main/resources"
+2. Build the project with
 `./mvnw clean install`
-2. Build the docker image with
+3. Build the docker image with
 `docker build -t backend .`
-3. Run the docker container with
+4. Run the docker container with
 `docker run -p 8080:8080 backend`
 
 
