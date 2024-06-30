@@ -22,16 +22,12 @@ public class notesController {
         this.noteService = noteService;
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<notes>> getAllNotes(Authentication authentication) {
-//        return noteService.getAllNotes();
-//    }
     @GetMapping
     public ResponseEntity<List<notes>> getAllNotes(Authentication authentication) {
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
             Long userId = userDetails.getUserId();
 
-            // You can now use the userId in your service call
+            // Use the userId to get notes for the user
             List<notes> notes = noteService.getAllNotesForUser(userId);
             return ResponseEntity.ok(notes);
         }
