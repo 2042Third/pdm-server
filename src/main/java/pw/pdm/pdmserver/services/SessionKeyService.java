@@ -3,6 +3,7 @@ package pw.pdm.pdmserver.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pw.pdm.pdmserver.controller.objects.SessionKeyObj;
 import pw.pdm.pdmserver.model.SessionKey;
 import pw.pdm.pdmserver.repository.SessionKeyRepository;
 import pw.pdm.pdmserver.model.User;
@@ -25,7 +26,7 @@ public class SessionKeyService {
     private UserRepository userRepository;
 
     @Transactional
-    public String generateSessionKey(String userEmail) {
+    public SessionKeyObj generateSessionKey(String userEmail) {
         User user = userRepository.findByEmail(userEmail);
         if (user == null) {
             throw new RuntimeException("User not found");
@@ -48,9 +49,10 @@ public class SessionKeyService {
         sk.setSessionKey(sessionKey);
         sk.setUserId(user.getId());
         sk.setExpirationTime(expirationTime);
+        SessionKeyObj skObj = new SessionKeyObj(sessionKey, expirationTime);
 
         sessionKeyRepository.save(sk);
-        return sessionKey;
+        return skObj;
     }
 
     public boolean isValidSessionKey(String sessionKey) {

@@ -40,8 +40,8 @@ public class AuthController {
             );
 
             if (authentication.isAuthenticated()) {
-                String sessionKey = sessionKeyService.generateSessionKey(credentials.getEmail());
-                return ResponseEntity.ok(new SessionKeyObj(sessionKey));
+                SessionKeyObj sessionKey = sessionKeyService.generateSessionKey(credentials.getEmail());
+                return ResponseEntity.ok(sessionKey);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
             }
