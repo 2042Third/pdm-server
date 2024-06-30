@@ -27,11 +27,16 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
         String sessionKey = request.getHeader("Session-Key");
 
-        if (sessionKey != null && sessionKeyService.isValidSessionKey(sessionKey)) {
-            String userEmail = sessionKeyService.getUserEmailBySessionKey(sessionKey);
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userEmail, null, new ArrayList<>());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (sessionKey != null && !sessionKey.trim().isEmpty()) {
+            sessionKey = sessionKey.trim();
+            if (sessionKey.length() == 36 && sessionKeyService.isValidSessionKey(sessionKey)) { // Assuming UUID
+                String userEmail = sessionKeyService.getUserEmailBySessionKey(sessionKey);
+                if (userEmail != null && !userEmail.isEmpty()) {
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userEmail, null, new ArrayList<>());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
         }
 
         filterChain.doFilter(request, response);

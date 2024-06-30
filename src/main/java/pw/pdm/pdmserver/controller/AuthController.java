@@ -7,7 +7,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import pw.pdm.pdmserver.controller.objects.SessionKeyObj;
+import pw.pdm.pdmserver.controller.objects.UserCredentialsObj;
 import pw.pdm.pdmserver.services.SessionKeyService;
 
 @RestController
@@ -35,5 +38,12 @@ public class AuthController {
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Session-Key") String sessionKey) {
+        sessionKeyService.invalidateSession(sessionKey);
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,4 +1,4 @@
-package pw.pdm.pdmserver.controller;
+package pw.pdm.pdmserver.controller.objects;
 
 import lombok.Getter;
 import lombok.Setter;
