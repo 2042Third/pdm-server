@@ -22,6 +22,10 @@ public class notesService {
         return notesRepo.findAll();
     }
 
+    public List<notes> getAllNotesForUser(Long userId) {
+        return notesRepo.findByUserId(userId);
+    }
+
     public Optional<notes> getNoteById(Integer id) {
         return notesRepo.findById(id);
     }

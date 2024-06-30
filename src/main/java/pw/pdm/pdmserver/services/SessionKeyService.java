@@ -67,6 +67,11 @@ public class SessionKeyService {
         return null;
     }
 
+    public Long getUserIdBySessionKey(String sessionKey) {
+        SessionKey sessionKeyEntity = sessionKeyRepository.findBySessionKey(sessionKey);
+        return sessionKeyEntity != null ? sessionKeyEntity.getUserId() : null;
+    }
+
     @Transactional
     public boolean refreshSession(String sessionKey) {
         SessionKey sk = sessionKeyRepository.findBySessionKey(sessionKey);

@@ -1,8 +1,11 @@
 package pw.pdm.pdmserver.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import pw.pdm.pdmserver.controller.objects.CustomUserDetails;
 import pw.pdm.pdmserver.model.notes;
 import pw.pdm.pdmserver.services.notesService;
 
@@ -19,9 +22,20 @@ public class notesController {
         this.noteService = noteService;
     }
 
+//    @GetMapping
+//    public ResponseEntity<List<notes>> getAllNotes(Authentication authentication) {
+//        return noteService.getAllNotes();
+//    }
     @GetMapping
-    public List<notes> getAllNotes() {
-        return noteService.getAllNotes();
+    public ResponseEntity<List<notes>> getAllNotes(Authentication authentication) {
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            Long userId = userDetails.getUserId();
+
+            // You can now use the userId in your service call
+            List<notes> notes = noteService.getAllNotesForUser(userId);
+            return ResponseEntity.ok(notes);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @GetMapping("/{id}")
