@@ -1,5 +1,8 @@
 package pw.pdm.pdmserver.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import pw.pdm.pdmserver.services.SessionKeyService;
 
 @RestController
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -23,7 +27,13 @@ public class AuthController {
     private SessionKeyService sessionKeyService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserCredentialsObj credentials) {
+    public ResponseEntity<?> login(@RequestBody UserCredentialsObj credentials, HttpServletRequest request) {
+        // Log the login user IP, user agent, and email
+        String userAgent = request.getHeader("User-Agent");
+        String ipAddress = getClientIp(request);
+
+        logger.info("Login attempt from {} with IP {} and User-Agent {}", credentials.getEmail(), ipAddress, userAgent);
+
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(credentials.getEmail(), credentials.getPassword())
@@ -45,5 +55,13 @@ public class AuthController {
         sessionKeyService.invalidateSession(sessionKey);
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok().build();
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null) {
+            return request.getRemoteAddr();
+        }
+        return xfHeader.split(",")[0];
     }
 }

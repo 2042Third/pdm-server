@@ -16,7 +16,7 @@ import java.util.UUID;
 public class SessionKeyService {
 
     private static final int SESSION_KEY_EXPIRATION_MINUTES = 30;
-    private static final int MAX_SESSIONS_PER_USER = 3;
+    private static final int MAX_SESSIONS_PER_USER = 5;
 
     @Autowired
     private SessionKeyRepository sessionKeyRepository;
