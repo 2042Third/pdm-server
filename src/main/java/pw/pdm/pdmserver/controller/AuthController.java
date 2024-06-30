@@ -57,6 +57,15 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/api/getUser")
+    public ResponseEntity<?> getUser(@RequestHeader("Session-Key") String sessionKey) {
+        if (sessionKeyService.isValidSessionKey(sessionKey)) {
+            return ResponseEntity.ok(sessionKeyService.getUserBySessionKey(sessionKey));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid session key");
+        }
+    }
+
     private String getClientIp(HttpServletRequest request) {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader == null) {

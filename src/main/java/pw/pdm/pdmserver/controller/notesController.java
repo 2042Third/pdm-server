@@ -1,12 +1,11 @@
 package pw.pdm.pdmserver.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import pw.pdm.pdmserver.controller.objects.CustomUserDetails;
+import pw.pdm.pdmserver.model.SessionKey;
 import pw.pdm.pdmserver.model.notes;
+import pw.pdm.pdmserver.services.SessionKeyService;
 import pw.pdm.pdmserver.services.notesService;
 
 import java.util.List;
@@ -16,22 +15,22 @@ import java.util.List;
 public class notesController {
 
     private final notesService noteService;
+    private final SessionKeyService sessionKeyService;
 
-    @Autowired
-    public notesController(notesService noteService) {
+    public notesController(notesService noteService, SessionKeyService sessionKeyService) {
         this.noteService = noteService;
+        this.sessionKeyService = sessionKeyService;
     }
 
     @GetMapping
-    public ResponseEntity<List<notes>> getAllNotes(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
-            Long userId = userDetails.getUserId();
-
-            // Use the userId to get notes for the user
-            List<notes> notes = noteService.getAllNotesForUser(userId);
+    public ResponseEntity<List<notes>> getAllNotes(@RequestHeader("Session-Key") String sessionKey) {
+        if (sessionKeyService.isValidSessionKey(sessionKey)) {
+            SessionKey sessionKeyOpt = sessionKeyService.findBySessionKey(sessionKey);
+            List<notes> notes = noteService.getAllNotesForUser(sessionKeyOpt.getUserId());
             return ResponseEntity.ok(notes);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @GetMapping("/{id}")

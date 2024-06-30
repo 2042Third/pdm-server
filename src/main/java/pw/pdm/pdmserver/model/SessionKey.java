@@ -2,13 +2,15 @@ package pw.pdm.pdmserver.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Data
 @Entity
+@Getter
+@Setter
 public class SessionKey {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

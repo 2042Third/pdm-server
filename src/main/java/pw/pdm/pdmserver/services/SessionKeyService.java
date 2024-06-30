@@ -25,6 +25,10 @@ public class SessionKeyService {
     @Autowired
     private UserRepository userRepository;
 
+    public SessionKey findBySessionKey(String sessionKey) {
+        return sessionKeyRepository.findBySessionKey(sessionKey);
+    }
+
     @Transactional
     public SessionKeyObj generateSessionKey(String userEmail) {
         User user = userRepository.findByEmail(userEmail);
@@ -65,6 +69,14 @@ public class SessionKeyService {
         if (sk != null && sk.getExpirationTime().isAfter(LocalDateTime.now())) {
             User user = userRepository.findById(sk.getUserId()).orElse(null);
             return user != null ? user.getEmail() : null;
+        }
+        return null;
+    }
+
+    public User getUserBySessionKey(String sessionKey) {
+        SessionKey sk = sessionKeyRepository.findBySessionKey(sessionKey);
+        if (sk != null && sk.getExpirationTime().isAfter(LocalDateTime.now())) {
+            return userRepository.findById(sk.getUserId()).orElse(null);
         }
         return null;
     }
