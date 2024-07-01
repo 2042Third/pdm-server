@@ -1,8 +1,11 @@
 package pw.pdm.pdmserver.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pw.pdm.pdmserver.controller.UserController;
 import pw.pdm.pdmserver.controller.objects.SessionKeyObj;
 import pw.pdm.pdmserver.model.SessionKey;
 import pw.pdm.pdmserver.repository.SessionKeyRepository;
@@ -15,6 +18,7 @@ import java.util.UUID;
 
 @Service
 public class SessionKeyService {
+    private static final Logger logger = LoggerFactory.getLogger(SessionKeyService.class);
 
     private static final int SESSION_KEY_EXPIRATION_MINUTES = 30;
     private static final int MAX_SESSIONS_PER_USER = 5;
@@ -41,6 +45,7 @@ public class SessionKeyService {
 
         // Check if user has reached the session limit
         int activeSessions = sessionKeyRepository.countActiveSessionsForUser(user.getId(), LocalDateTime.now());
+        logger.info("User Generating session key, currently active {} session keys.",activeSessions);
         if (activeSessions >= MAX_SESSIONS_PER_USER) {
             throw new RuntimeException("Maximum number of active sessions reached");
         }

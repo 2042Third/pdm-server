@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import pw.pdm.pdmserver.controller.objects.SessionKeyObj;
 import pw.pdm.pdmserver.controller.objects.UserCredentialsObj;
 import pw.pdm.pdmserver.services.SessionKeyService;
+import pw.pdm.pdmserver.util.Common;
+
+import static pw.pdm.pdmserver.util.Common.getClientIp;
 
 @RestController
 public class AuthController {
@@ -50,27 +53,6 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Session-Key") String sessionKey) {
-        sessionKeyService.invalidateSession(sessionKey);
-        SecurityContextHolder.clearContext();
-        return ResponseEntity.ok().build();
-    }
 
-    @PostMapping("/api/getUser")
-    public ResponseEntity<?> getUser(@RequestHeader("Session-Key") String sessionKey) {
-        if (sessionKeyService.isValidSessionKey(sessionKey)) {
-            return ResponseEntity.ok(sessionKeyService.getUserBySessionKey(sessionKey));
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid session key");
-        }
-    }
 
-    private String getClientIp(HttpServletRequest request) {
-        String xfHeader = request.getHeader("X-Forwarded-For");
-        if (xfHeader == null) {
-            return request.getRemoteAddr();
-        }
-        return xfHeader.split(",")[0];
-    }
 }

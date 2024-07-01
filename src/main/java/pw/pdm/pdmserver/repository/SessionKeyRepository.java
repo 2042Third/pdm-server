@@ -25,7 +25,4 @@ public interface SessionKeyRepository extends JpaRepository<SessionKey, Long> {
     @Query("SELECT COUNT(sk) FROM SessionKey sk WHERE sk.userId = :userId AND sk.expirationTime > :now")
     int countActiveSessionsForUser(Long userId, LocalDateTime now);
 
-    @Query(value = "SELECT u.* FROM userinfo u JOIN SessionKey sk ON u.id = sk.userId " +
-            "WHERE sk.sessionKey = :sessionKey AND sk.expirationTime > CURRENT_TIMESTAMP", nativeQuery = true)
-    Optional<User> findUserBySessionKey(@Param("sessionKey") String sessionKey);
 }
