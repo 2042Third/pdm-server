@@ -41,4 +41,13 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid session key");
         }
     }
+
+    @GetMapping("/validate")
+    public ResponseEntity<?> validateSession(@RequestHeader("Session-Key") String sessionKey) {
+        if (sessionKeyService.isValidSessionKey(sessionKey)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid session key");
+        }
+    }
 }
