@@ -120,9 +120,9 @@
                 <configuration>
                     <skip>false</skip>
                     <imageName>pdm-server</imageName>
-                    <buildArgs>
-                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>
-                    </buildArgs>
+<!--                    <buildArgs>-->
+<!--                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>-->
+<!--                    </buildArgs>-->
                     <agent>
                         <enabled>true</enabled>
                     </agent>
