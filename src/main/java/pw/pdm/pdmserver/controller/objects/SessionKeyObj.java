@@ -1,12 +1,8 @@
 package pw.pdm.pdmserver.controller.objects;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
-@Setter
-@Getter
 public class SessionKeyObj {
     private String sessionKey;
     private LocalDateTime expirationTime;
@@ -16,4 +12,24 @@ public class SessionKeyObj {
         this.sessionKey = sessionKey;
     }
 
+    // Getters and Setters
+    public String getSessionKey() {
+        return sessionKey;
+    }
+
+    public void setSessionKey(String sessionKey) {
+        this.sessionKey = sessionKey;
+    }
+
+    public LocalDateTime getExpirationTime() {
+        return expirationTime;
+    }
+
+    public void setExpirationTime(LocalDateTime expirationTime) {
+        this.expirationTime = expirationTime;
+    }
+
+    public long getExpirationTimeUnix() {
+        return this.expirationTime.toEpochSecond(ZoneOffset.UTC);
+    }
 }

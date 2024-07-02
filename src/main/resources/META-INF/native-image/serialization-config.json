@@ -1,0 +1,14 @@
+[
+  {
+    "name": "pw.pdm.pdmserver.controller.objects.UserCredentialsObj",
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "pw.pdm.pdmserver.controller.objects.SessionKeyObj",
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true
+  }
+]

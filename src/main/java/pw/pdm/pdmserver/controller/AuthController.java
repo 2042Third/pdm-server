@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +17,8 @@ import pw.pdm.pdmserver.controller.objects.SessionKeyObj;
 import pw.pdm.pdmserver.controller.objects.UserCredentialsObj;
 import pw.pdm.pdmserver.services.SessionKeyService;
 import pw.pdm.pdmserver.util.Common;
+
+import java.util.Map;
 
 import static pw.pdm.pdmserver.util.Common.getClientIp;
 
@@ -29,7 +32,7 @@ public class AuthController {
     @Autowired
     private SessionKeyService sessionKeyService;
 
-    @PostMapping("/login")
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody UserCredentialsObj credentials, HttpServletRequest request) {
         // Log the login user IP, user agent, and email
         String userAgent = request.getHeader("User-Agent");
@@ -44,12 +47,18 @@ public class AuthController {
 
             if (authentication.isAuthenticated()) {
                 SessionKeyObj sessionKey = sessionKeyService.generateSessionKey(credentials.getEmail());
-                return ResponseEntity.ok(sessionKey);
+                return ResponseEntity.ok().body(Map.of(
+                        "sessionKey", sessionKey.getSessionKey(),
+                        "expirationTime", sessionKey.getExpirationTimeUnix(),
+                        "message", "Login successful"
+                ));
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "Invalid credentials"));
             }
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid credentials"));
         }
     }
 

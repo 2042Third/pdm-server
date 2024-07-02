@@ -2,7 +2,7 @@ package pw.pdm.pdmserver.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pw.pdm.pdmserver.model.notes;
+import pw.pdm.pdmserver.model.Notes;
 import pw.pdm.pdmserver.repository.notesRepository;
 
 import java.util.List;
@@ -18,19 +18,19 @@ public class notesService {
         this.notesRepo = notesRepo;
     }
 
-    public List<notes> getAllNotes() {
+    public List<Notes> getAllNotes() {
         return notesRepo.findAll();
     }
 
-    public List<notes> getAllNotesForUser(Long userId) {
+    public List<Notes> getAllNotesForUser(Long userId) {
         return notesRepo.findByUserId(userId);
     }
 
-    public Optional<notes> getNoteById(Integer id) {
+    public Optional<Notes> getNoteById(Integer id) {
         return notesRepo.findById(id);
     }
 
-    public notes saveNote(notes note) {
+    public Notes saveNote(Notes note) {
         return notesRepo.save(note);
     }
 

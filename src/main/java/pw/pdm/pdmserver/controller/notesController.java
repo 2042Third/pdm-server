@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pw.pdm.pdmserver.model.SessionKey;
-import pw.pdm.pdmserver.model.notes;
+import pw.pdm.pdmserver.model.Notes;
 import pw.pdm.pdmserver.services.SessionKeyService;
 import pw.pdm.pdmserver.services.notesService;
 
@@ -23,10 +23,10 @@ public class notesController {
     }
 
     @GetMapping
-    public ResponseEntity<List<notes>> getAllNotes(@RequestHeader("Session-Key") String sessionKey) {
+    public ResponseEntity<List<Notes>> getAllNotes(@RequestHeader("Session-Key") String sessionKey) {
         if (sessionKeyService.isValidSessionKey(sessionKey)) {
             SessionKey sessionKeyOpt = sessionKeyService.findBySessionKey(sessionKey);
-            List<notes> notes = noteService.getAllNotesForUser(sessionKeyOpt.getUserId());
+            List<Notes> notes = noteService.getAllNotesForUser(sessionKeyOpt.getUserId());
             return ResponseEntity.ok(notes);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -34,19 +34,19 @@ public class notesController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<notes> getNoteById(@PathVariable Integer id) {
+    public ResponseEntity<Notes> getNoteById(@PathVariable Integer id) {
         return noteService.getNoteById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public notes createNote(@RequestBody notes note) {
+    public Notes createNote(@RequestBody Notes note) {
         return noteService.saveNote(note);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<notes> updateNote(@PathVariable Integer id, @RequestBody notes note) {
+    public ResponseEntity<Notes> updateNote(@PathVariable Integer id, @RequestBody Notes note) {
         return noteService.getNoteById(id)
                 .map(existingNote -> {
                     note.setNoteid(id);
