@@ -18,4 +18,16 @@
 ### Username, Ports
 - Files: "application.properties" 
 
+### GraalVM
+#### Requirements
+- GraalVM:
+  `-> java -version
+  java version "21.0.3" 2024-04-16 LTS
+  Java(TM) SE Runtime Environment Oracle GraalVM 21.0.3+7.1 (build 21.0.3+7-LTS-jvmci-23.1-b37)
+  Java HotSpot(TM) 64-Bit Server VM Oracle GraalVM 21.0.3+7.1 (build 21.0.3+7-LTS-jvmci-23.1-b37, mixed mode, sharing)
+`
+### Build
+1. ./mvnw clean package -Pnative
+2. pm2 start ecosystem.config.js
+
 
