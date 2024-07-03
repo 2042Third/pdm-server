@@ -18,17 +18,26 @@ import static pw.pdm.pdmserver.util.Common.getClientIp;
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private SessionKeyService sessionKeyService;
+    private final SessionKeyService sessionKeyService;
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Session-Key") String sessionKey) {
-        sessionKeyService.invalidateSession(sessionKey);
-        SecurityContextHolder.clearContext();
-        return ResponseEntity.ok().build();
+    public UserController(AuthenticationManager authenticationManager, SessionKeyService sessionKeyService) {
+        this.authenticationManager = authenticationManager;
+        this.sessionKeyService = sessionKeyService;
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Session-Key") String sessionKey, HttpServletRequest request) {
+        logger.info("Logout attempt using Session Key {} with IP {}", sessionKey, getClientIp(request));
+
+        if (sessionKeyService.isValidSessionKey(sessionKey)) {
+            sessionKeyService.invalidateSession(sessionKey);
+            SecurityContextHolder.clearContext();
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid session key");
+        }
     }
 
     @GetMapping
@@ -36,7 +45,18 @@ public class UserController {
         logger.info("User Data attempt using Session Key {} with IP {}", sessionKey, getClientIp(request) );
 
         if (sessionKeyService.isValidSessionKey(sessionKey)) {
-            return ResponseEntity.ok(sessionKeyService.getUserBySessionKey(sessionKey));
+            return ResponseEntity.ok(sessionKeyService.getUserDtoBySessionKey(sessionKey));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid session key");
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<?> getUserWithPOST(@RequestHeader("Session-Key") String sessionKey, HttpServletRequest request) {
+        logger.info("User Data with POST attempt using Session Key {} with IP {}", sessionKey, getClientIp(request) );
+
+        if (sessionKeyService.isValidSessionKey(sessionKey)) {
+            return ResponseEntity.ok(sessionKeyService.getUserDtoBySessionKey(sessionKey));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid session key");
         }

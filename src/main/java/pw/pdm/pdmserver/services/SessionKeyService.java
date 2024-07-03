@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pw.pdm.pdmserver.controller.UserController;
 import pw.pdm.pdmserver.controller.objects.SessionKeyObj;
 import pw.pdm.pdmserver.model.SessionKey;
+import pw.pdm.pdmserver.model.dto.UserDto;
 import pw.pdm.pdmserver.repository.SessionKeyRepository;
 import pw.pdm.pdmserver.model.User;
 import pw.pdm.pdmserver.repository.UserRepository;
@@ -23,11 +24,14 @@ public class SessionKeyService {
     private static final int SESSION_KEY_EXPIRATION_MINUTES = 30;
     private static final int MAX_SESSIONS_PER_USER = 5;
 
-    @Autowired
-    private SessionKeyRepository sessionKeyRepository;
+    private final SessionKeyRepository sessionKeyRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public SessionKeyService(SessionKeyRepository sessionKeyRepository, UserRepository userRepository) {
+        this.sessionKeyRepository = sessionKeyRepository;
+        this.userRepository = userRepository;
+    }
 
     public SessionKey findBySessionKey(String sessionKey) {
         return sessionKeyRepository.findBySessionKey(sessionKey);
@@ -82,6 +86,14 @@ public class SessionKeyService {
         SessionKey sk = sessionKeyRepository.findBySessionKey(sessionKey);
         if (sk != null && sk.getExpirationTime().isAfter(LocalDateTime.now())) {
             return userRepository.findById(sk.getUserId()).orElse(null);
+        }
+        return null;
+    }
+
+    public UserDto getUserDtoBySessionKey(String sessionKey) {
+        SessionKey sk = sessionKeyRepository.findBySessionKey(sessionKey);
+        if (sk != null && sk.getExpirationTime().isAfter(LocalDateTime.now())) {
+            return userRepository.findDtoById(sk.getUserId()).orElse(null);
         }
         return null;
     }

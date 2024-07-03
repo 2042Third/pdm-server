@@ -30,6 +30,7 @@
         <java.version>21</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <native.build.skip>true</native.build.skip>
     </properties>
     <dependencies>
         <dependency>
@@ -118,30 +119,22 @@
                 <version>0.10.2</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <skip>false</skip>
+                    <skip>${native.build.skip}</skip>
                     <imageName>pdm-server</imageName>
-<!--                    <buildArgs>-->
-<!--                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>-->
-<!--                    </buildArgs>-->
                     <agent>
                         <enabled>true</enabled>
                     </agent>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>build-native</id>
-                        <goals>
-                            <goal>compile-no-fork</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
+
     <profiles>
         <profile>
             <id>native</id>
+            <properties>
+                <native.build.skip>false</native.build.skip>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -159,6 +152,16 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <profile>
+            <id>java</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <native.build.skip>true</native.build.skip>
+            </properties>
         </profile>
     </profiles>
 </project>
