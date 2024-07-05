@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import pw.pdm.pdmserver.controller.objects.response.SessionValidationResponse;
 import pw.pdm.pdmserver.services.SessionKeyService;
 
 import static pw.pdm.pdmserver.util.Common.getClientIp;
@@ -65,9 +66,11 @@ public class UserController {
     @GetMapping("/validate")
     public ResponseEntity<?> validateSession(@RequestHeader("Session-Key") String sessionKey) {
         if (sessionKeyService.isValidSessionKey(sessionKey)) {
-            return ResponseEntity.ok().build();
+            SessionValidationResponse response = new SessionValidationResponse(true, "Session key is valid");
+            return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid session key");
+            SessionValidationResponse response = new SessionValidationResponse(false, "Session key is invalid");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
 }
