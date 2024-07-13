@@ -3,6 +3,10 @@ package pw.pdm.pdmserver.controller.objects.request;
 public class RefreshKeyValidationRequest {
     private String refreshKey;
 
+    // Add this no-argument constructor
+    public RefreshKeyValidationRequest() {
+    }
+
     public RefreshKeyValidationRequest(String refreshKey) {
         this.refreshKey = refreshKey;
     }
