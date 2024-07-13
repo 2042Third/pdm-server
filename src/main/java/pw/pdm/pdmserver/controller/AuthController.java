@@ -13,8 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import pw.pdm.pdmserver.controller.objects.RefreshKeyObj;
 import pw.pdm.pdmserver.controller.objects.SessionKeyObj;
 import pw.pdm.pdmserver.controller.objects.UserCredentialsObj;
+import pw.pdm.pdmserver.services.RefreshKeyService;
 import pw.pdm.pdmserver.services.SessionKeyService;
 import pw.pdm.pdmserver.util.Common;
 
@@ -26,14 +28,20 @@ import static pw.pdm.pdmserver.util.Common.getClientIp;
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private SessionKeyService sessionKeyService;
+    private final SessionKeyService sessionKeyService;
+
+    private final RefreshKeyService refreshKeyService;
+
+    public AuthController(AuthenticationManager authenticationManager, SessionKeyService sessionKeyService, RefreshKeyService refreshKeyService) {
+        this.authenticationManager = authenticationManager;
+        this.sessionKeyService = sessionKeyService;
+        this.refreshKeyService = refreshKeyService;
+    }
 
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> login(@RequestBody UserCredentialsObj credentials, HttpServletRequest request) {
+    public ResponseEntity<?> login(@RequestBody UserCredentialsObj credentials, @RequestHeader("SCOPE") String scope, HttpServletRequest request) {
         // Log the login user IP, user agent, and email
         String userAgent = request.getHeader("User-Agent");
         String ipAddress = getClientIp(request);
@@ -47,6 +55,18 @@ public class AuthController {
 
             if (authentication.isAuthenticated()) {
                 SessionKeyObj sessionKey = sessionKeyService.generateSessionKey(credentials.getEmail());
+                if (scope!=null && scope.contains("refresh")) {
+                    logger.info("Login with refresh key scope");
+                    RefreshKeyObj refreshKeyObj = refreshKeyService.generateRefreshKey(credentials.getEmail());
+                    return ResponseEntity.ok().body(Map.of(
+                            "sessionKey", sessionKey.getSessionKey(),
+                            "expirationTime", sessionKey.getExpirationTimeUnix(),
+                            "refreshKey", refreshKeyObj.getRefreshKey(),
+                            "refreshKeyExpirationTime", refreshKeyObj.getRefreshKeyExpirationTime(),
+                            "message", "Login successful"
+                    ));
+                }
+
                 return ResponseEntity.ok().body(Map.of(
                         "sessionKey", sessionKey.getSessionKey(),
                         "expirationTime", sessionKey.getExpirationTimeUnix(),
@@ -60,6 +80,33 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Invalid credentials"));
         }
+    }
+
+    @PostMapping(value = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> refresh(@RequestBody Map<String, String> body, HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent");
+        String ipAddress = getClientIp(request);
+
+        logger.info("Refresh attempt from {} with IP {} and User-Agent {}", body.get("refreshKey"), ipAddress, userAgent);
+
+        String refreshKey = body.get("refreshKey");
+        if (refreshKey == null || refreshKey.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Refresh key is required"));
+        }
+
+        if (!refreshKeyService.isValidRefreshKey(refreshKey)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid refresh key"));
+        }
+
+        SessionKeyObj sessionKeyObj = refreshKeyService.refreshSessionKey(refreshKey);
+
+        return ResponseEntity.ok().body(Map.of(
+                "sessionKey", sessionKeyObj.getSessionKey(),
+                "expirationTime", sessionKeyObj.getExpirationTimeUnix(),
+                "message", "Refresh successful"
+        ));
     }
 
 
