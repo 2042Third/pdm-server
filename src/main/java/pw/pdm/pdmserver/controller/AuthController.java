@@ -83,7 +83,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> refresh(@RequestBody Map<String, String> body, HttpServletRequest request) {
+    public ResponseEntity<?> refresh(@RequestHeader("Session-Key") String sessionKey, @RequestBody Map<String, String> body, HttpServletRequest request) {
         String userAgent = request.getHeader("User-Agent");
         String ipAddress = getClientIp(request);
 
@@ -101,6 +101,11 @@ public class AuthController {
         }
 
         SessionKeyObj sessionKeyObj = refreshKeyService.refreshSessionKey(refreshKey);
+
+        if (sessionKey != null) {
+            logger.info("Has input session key, it is being invalidated.");
+            sessionKeyService.invalidateSession(sessionKey);
+        }
 
         return ResponseEntity.ok().body(Map.of(
                 "sessionKey", sessionKeyObj.getSessionKey(),
