@@ -94,7 +94,11 @@ public class SessionKeyService {
     public UserDto getUserDtoBySessionKey(String sessionKey) {
         SessionKey sk = sessionKeyRepository.findBySessionKey(sessionKey);
         if (sk != null && sk.getExpirationTime().isAfter(LocalDateTime.now())) {
-            return userRepository.findDtoById(sk.getUserId()).orElse(null);
+            User user = userRepository.findById(sk.getUserId()).orElse(null);
+            if (user != null) {
+                return new UserDto(user.getId(), user.getEmail(), user.getProduct(), user.getCreation(), user.getEmail());
+            }
+            return null;
         }
         return null;
     }
