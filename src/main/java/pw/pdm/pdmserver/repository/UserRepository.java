@@ -13,6 +13,4 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
 
-    @Query("SELECT new pw.pdm.pdmserver.model.dto.UserDto(u.id, u.name, u.product, u.creation, u.email) FROM User u WHERE u.id = :id")
-    Optional<UserDto> findDtoById(@Param("id") Long id);
 }

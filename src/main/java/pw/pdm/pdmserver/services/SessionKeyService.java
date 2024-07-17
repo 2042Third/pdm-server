@@ -16,6 +16,7 @@ import pw.pdm.pdmserver.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -94,7 +95,14 @@ public class SessionKeyService {
     public UserDto getUserDtoBySessionKey(String sessionKey) {
         SessionKey sk = sessionKeyRepository.findBySessionKey(sessionKey);
         if (sk != null && sk.getExpirationTime().isAfter(LocalDateTime.now())) {
-            return userRepository.findDtoById(sk.getUserId()).orElse(null);
+            Optional<User> userOptional = userRepository.findById(sk.getUserId());
+            return userOptional.map(user -> new UserDto(
+                    user.getId(),
+                    user.getName(),
+                    user.getProduct(),
+                    user.getCreation(),
+                    user.getEmail()
+            )).orElse(null);
         }
         return null;
     }

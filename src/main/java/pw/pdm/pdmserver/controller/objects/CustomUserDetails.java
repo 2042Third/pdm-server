@@ -7,9 +7,9 @@ import java.util.Collection;
 public class CustomUserDetails implements UserDetails {
     private String email;
     private Long userId;
-    private Collection<? extends GrantedAuthority> authorities;
+    private final Collection<GrantedAuthority> authorities;
 
-    public CustomUserDetails(String email, Long userId, Collection<? extends GrantedAuthority> authorities) {
+    public CustomUserDetails(String email, Long userId, Collection<GrantedAuthority> authorities) {
         this.email = email;
         this.userId = userId;
         this.authorities = authorities;
@@ -52,5 +52,14 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "CustomUserDetails{" +
+                "email='" + email + '\'' +
+                ", userId=" + userId +
+                ", authorities=" + authorities +
+                '}';
     }
 }

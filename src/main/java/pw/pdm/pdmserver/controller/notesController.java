@@ -2,6 +2,7 @@ package pw.pdm.pdmserver.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pw.pdm.pdmserver.model.SessionKey;
 import pw.pdm.pdmserver.model.Notes;
@@ -22,7 +23,8 @@ public class notesController {
         this.sessionKeyService = sessionKeyService;
     }
 
-    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping(value = "/", produces = "application/json")
     public ResponseEntity<List<Notes>> getAllNotes(@RequestHeader("Session-Key") String sessionKey) {
         if (sessionKeyService.isValidSessionKey(sessionKey)) {
             SessionKey sessionKeyOpt = sessionKeyService.findBySessionKey(sessionKey);
@@ -33,6 +35,7 @@ public class notesController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<Notes> getNoteById(@PathVariable Integer id) {
         return noteService.getNoteById(id)
@@ -40,12 +43,14 @@ public class notesController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value = "/", produces = "application/json")
     public Notes createNote(@RequestBody Notes note) {
         return noteService.saveNote(note);
     }
 
-    @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping(value="/{id}", produces = "application/json")
     public ResponseEntity<Notes> updateNote(@PathVariable Integer id, @RequestBody Notes note) {
         return noteService.getNoteById(id)
                 .map(existingNote -> {
@@ -55,6 +60,7 @@ public class notesController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNote(@PathVariable Integer id) {
         return noteService.getNoteById(id)

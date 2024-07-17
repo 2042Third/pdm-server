@@ -121,6 +121,11 @@
                 <configuration>
                     <skip>${native.build.skip}</skip>
                     <imageName>pdm-server</imageName>
+                    <buildArgs>
+                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+                        <buildArg>-H:+PrintClassInitialization</buildArg>
+                        <buildArg>--initialize-at-build-time=pw.pdm.pdmserver.model.User,pw.pdm.pdmserver.model.dto.UserDto,pw.pdm.pdmserver.repository.UserRepository</buildArg>
+                    </buildArgs>
                     <agent>
                         <enabled>true</enabled>
                     </agent>

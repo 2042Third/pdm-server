@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.stereotype.Component;
@@ -42,39 +43,37 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         logger.info("[CustomAuthenticationFilter] Request URI: {}", requestUri);
         logger.info("[CustomAuthenticationFilter] Request Method: {}", request.getMethod());
 
-        if (isWhitelistedEndpoint(requestUri)) {
-            logger.info("[CustomAuthenticationFilter] Skipping authentication for whitelisted endpoint: {}", requestUri);
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        logger.info("[CustomAuthenticationFilter] Checking for Session-Key header...");
-        String sessionKey = request.getHeader("Session-Key");
-        if (sessionKey != null && !sessionKey.trim().isEmpty()) {
-            sessionKey = sessionKey.trim();
-            logger.info("[CustomAuthenticationFilter] Session-Key found: {}", sessionKey);
-            if (sessionKey.length() == 36 && sessionKeyService.isValidSessionKey(sessionKey)) {
-                logger.info("[CustomAuthenticationFilter] Valid Session-Key");
-                String userEmail = sessionKeyService.getUserEmailBySessionKey(sessionKey);
-                Long userId = sessionKeyService.getUserIdBySessionKey(sessionKey);
-                if (userEmail != null && !userEmail.isEmpty() && userId != null) {
-                    CustomUserDetails userDetails = new CustomUserDetails(userEmail, userId, new ArrayList<>());
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    filterChain.doFilter(request, response);
+        if (!isWhitelistedEndpoint(requestUri)) {
+            String sessionKey = request.getHeader("Session-Key");
+            if (sessionKey != null && !sessionKey.trim().isEmpty()) {
+                sessionKey = sessionKey.trim();
+                logger.info("[CustomAuthenticationFilter] Session-Key found: {}", sessionKey);
+                if (sessionKey.length() == 36 && sessionKeyService.isValidSessionKey(sessionKey)) {
+                    logger.info("[CustomAuthenticationFilter] Valid Session-Key");
+                    String userEmail = sessionKeyService.getUserEmailBySessionKey(sessionKey);
+                    Long userId = sessionKeyService.getUserIdBySessionKey(sessionKey);
+                    if (userEmail != null && !userEmail.isEmpty() && userId != null) {
+                        CustomUserDetails userDetails = new CustomUserDetails(userEmail, userId, new ArrayList<>());
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        logger.info("[CustomAuthenticationFilter] Authentication set in SecurityContextHolder: {}", authentication);
+                    }
+                } else {
+                    logger.info("[CustomAuthenticationFilter] Invalid Session-Key");
+                    sendInvalidSessionKeyResponse(response);
                     return;
                 }
             } else {
-                logger.info("[CustomAuthenticationFilter] Invalid Session-Key");
-                sendInvalidSessionKeyResponse(response);
+                logger.info("[CustomAuthenticationFilter] No Session-Key found");
+                sendMissingSessionKeyResponse(response);
                 return;
             }
-        } else {
-            logger.info("[CustomAuthenticationFilter] No Session-Key found");
-            sendMissingSessionKeyResponse(response);
-            return;
         }
+
+        filterChain.doFilter(request, response);
+        logger.info("[CustomAuthenticationFilter] Authentication after filter chain: {}", SecurityContextHolder.getContext().getAuthentication());
     }
 
     private boolean isWhitelistedEndpoint(String requestUri) {
