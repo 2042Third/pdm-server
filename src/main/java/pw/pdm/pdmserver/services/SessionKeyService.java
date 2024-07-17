@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pw.pdm.pdmserver.controller.UserController;
 import pw.pdm.pdmserver.controller.objects.SessionKeyObj;
+import pw.pdm.pdmserver.exception.MaxSessionsReachedException;
 import pw.pdm.pdmserver.model.SessionKey;
 import pw.pdm.pdmserver.model.dto.UserDto;
 import pw.pdm.pdmserver.repository.SessionKeyRepository;
@@ -51,7 +52,7 @@ public class SessionKeyService {
         int activeSessions = sessionKeyRepository.countActiveSessionsForUser(user.getId(), LocalDateTime.now());
         logger.info("User Generating session key, currently active {} session keys.",activeSessions);
         if (activeSessions >= MAX_SESSIONS_PER_USER) {
-            throw new RuntimeException("Maximum number of active sessions reached");
+            throw new MaxSessionsReachedException("Maximum number of active sessions reached");
         }
 
         // Generate new session key

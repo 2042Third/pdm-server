@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.stereotype.Component;
 import pw.pdm.pdmserver.controller.objects.CustomUserDetails;
@@ -26,7 +27,7 @@ import java.util.Map;
 public class CustomAuthenticationFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(CustomAuthenticationFilter.class);
 
-    private static final List<String> WHITELISTED_ENDPOINTS = Arrays.asList("/login", "/register");
+    private static final List<String> WHITELISTED_ENDPOINTS = Arrays.asList("/login", "/register", "/refresh");
 
     @Autowired
     private SessionKeyService sessionKeyService;
@@ -97,4 +98,5 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         errorDetails.put("message", "No session key provided in the request");
         response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
     }
+
 }

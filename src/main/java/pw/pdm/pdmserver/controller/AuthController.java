@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import pw.pdm.pdmserver.controller.objects.RefreshKeyObj;
 import pw.pdm.pdmserver.controller.objects.SessionKeyObj;
 import pw.pdm.pdmserver.controller.objects.UserCredentialsObj;
+import pw.pdm.pdmserver.controller.objects.response.CommonResponse;
+import pw.pdm.pdmserver.exception.MaxSessionsReachedException;
 import pw.pdm.pdmserver.services.RefreshKeyService;
 import pw.pdm.pdmserver.services.SessionKeyService;
 import pw.pdm.pdmserver.util.Common;
@@ -79,7 +81,14 @@ public class AuthController {
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Invalid credentials"));
+        } catch (MaxSessionsReachedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new CommonResponse("Maximum number of active sessions reached", "Error"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Unknown Error"));
         }
+
     }
 
     @PostMapping(value = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
