@@ -10,5 +10,59 @@
     "allPublicMethods": true,
     "allPublicFields": true,
     "allPublicConstructors": true
+  },
+  {
+    "name": "pw.pdm.pdmserver.model.dto.UserDTO",
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "pw.pdm.pdmserver.controller.objects.RefreshKeyObj",
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "pw.pdm.pdmserver.controller.objects.RefreshKeyObj",
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "pw.pdm.pdmserver.controller.objects.RefreshKeySessionKeyObj",
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "pw.pdm.pdmserver.controller.objects.CustomUserDetails",
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "pw.pdm.pdmserver.controller.objects.response.CommonResponse",
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "pw.pdm.pdmserver.controller.objects.response.RefreshKeyValidationResponse",
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "pw.pdm.pdmserver.controller.objects.request.RefreshKeyValidationRequest",
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "pw.pdm.pdmserver.controller.objects.response.SessionValidationResponse",
+    "allPublicMethods": true,
+    "allPublicFields": true,
+    "allPublicConstructors": true
   }
 ]

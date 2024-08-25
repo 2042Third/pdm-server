@@ -4,9 +4,9 @@ module.exports = {
         {
             name: 'pdm-server',
 
-            // script: 'java',
-            // args: '-jar target/pdm-server-0.0.1-SNAPSHOT.jar',
-            script: './target/pdm-server',
+            script: 'java',
+            args: '-jar target/pdm-server-0.0.1-SNAPSHOT.jar',
+            // script: './target/pdm-server',
             interpreter: 'none',
             exec_mode: 'fork_mode',
             instances: 1,
